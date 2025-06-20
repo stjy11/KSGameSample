@@ -30,17 +30,17 @@ public class GameController {
     public String gameMain(HttpSession session, Model model) {
         Long memberId = (Long) session.getAttribute("loggedInMemberId");
         if (memberId == null) {
-            log.warn("로그인되지 않은 사용자가 게임 메인 페이지에 접근 시도. 로그인 페이지로 리다이렉트.");
+            log.warn("ログインしていないメンバーがゲームにアクセスしようとする。 ログインページに移動。");
             return "redirect:/login";
         }
 
         try {
             GameStatDto gameStat = gameService.getGameStatusForMain(memberId);
             model.addAttribute("gameStat", gameStat);
-            log.info("게임 메인 페이지 로드 성공: 성공 ID = {}", memberId);
+            log.info("ゲームメインページのロード成功:会員ID = {}", memberId);
         } catch (Exception e) {
-            log.error("게임 메인 페이지 로드 중 오류 발생: Member ID = {}", memberId, e);
-            model.addAttribute("errorMessage", "게임 로드 중 오류가 발생했습니다.");
+            log.error("ゲームメインページのロード中にエラー: 会員ID = {}", memberId, e);
+            model.addAttribute("errorMessage", "ゲームのロード中にエラーが発生。");
             return "error/errorPage";
         }
         return "game-main";
@@ -53,64 +53,64 @@ public class GameController {
                                     BindingResult bindingResult) {
 
         if (memberId == null) {
-            log.warn("세션 만료 또는 로그인되지 않은 사용자의 예측 시도. 에러 상태 반환.");
+            log.warn("ログインされていないユーザーのゲームの試行。");
             GameStatDto errorStat = new GameStatDto();
-            errorStat.setMessage("세션이 만료되었거나 로그인되지 않았습니다. 다시 로그인해주세요.");
+            errorStat.setMessage("ログインできませんでした。 もう一度ログインしてください。");
             errorStat.setGameOver(true);
             return errorStat;
         }
 
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldError().getDefaultMessage();
-            log.warn("사용자 입력 유효성 검사 실패: Member ID = {}, Input = {}, Errors = {}", memberId, playDto.getInputNumber(), errorMessage);
+            log.warn("会員入力チェック失敗: Member ID = {}, Input = {}, Errors = {}", memberId, playDto.getInputNumber(), errorMessage);
             try {
                 GameStatDto errorStat = gameService.getGameStatusForMain(memberId);
                 errorStat.setMessage(errorMessage);
                 return errorStat;
             } catch (Exception e) {
-                log.error("유효성 검사 실패 후 게임 상태 로드 중 오류 발생: Member ID = {}", memberId, e);
+                log.error("会員入力チェック失敗後のゲームロード中のエラー: Member ID = {}", memberId, e);
                 GameStatDto fatalError = new GameStatDto();
-                fatalError.setMessage("입력값 오류 및 게임 상태 로드 중 치명적인 오류 발생.");
+                fatalError.setMessage("入力値エラーとゲームステータスのロード中に致命的なエラーが発生します。");
                 fatalError.setGameOver(true);
                 return fatalError;
             }
         }
 
         try {
-            log.info("사용자 예측 처리 시작: Member ID = {}, Input = {}", memberId, playDto.getInputNumber());
+            log.info("会員ゲーム進行処理開始: Member ID = {}, Input = {}", memberId, playDto.getInputNumber());
             GameStatDto updatedStat = gameService.processGuess(memberId, playDto);
-            log.info("사용자 예측 처리 완료: Member ID = {}, Result = {}", memberId, updatedStat);
+            log.info("会員ゲーム進行処理完了: Member ID = {}, Result = {}", memberId, updatedStat);
 
             if (updatedStat.isGameOver()) {
-                log.info("게임 종료: Member ID = {}, Game Won = {}", memberId, updatedStat.isGameWon());
+                log.info("ゲーム終了: Member ID = {}, Game Won = {}", memberId, updatedStat.isGameWon());
             }
             return updatedStat;
 
         } catch (IllegalStateException e) {
-            log.warn("게임 진행 중 상태 오류 발생: Member ID = {}, Error = {}", memberId, e.getMessage());
+            log.warn("ゲーム進行中に状態エラー発生: Member ID = {}, Error = {}", memberId, e.getMessage());
             try {
                 GameStatDto errorStat = gameService.getGameStatusForMain(memberId);
                 errorStat.setMessage(e.getMessage());
                 errorStat.setGameOver(true);
                 return errorStat;
             } catch (Exception ex) {
-                log.error("상태 오류 후 게임 상태 로드 중 오류 발생: Member ID = {}", memberId, ex);
+                log.error("ステータスエラー後、ゲームステータスのロード中にエラーが発生: Member ID = {}", memberId, ex);
                 GameStatDto fatalError = new GameStatDto();
-                fatalError.setMessage("게임 상태 처리 중 치명적인 오류 발생.");
+                fatalError.setMessage("ゲーム状態の処理中に致命的なエラーが発生します。");
                 fatalError.setGameOver(true);
                 return fatalError;
             }
         } catch (Exception e) {
-            log.error("숫자 예측 처리 중 알 수 없는 오류 발생: Member ID = {}, Input = {}", memberId, playDto.getInputNumber(), e);
+            log.error("ゲーム進行処理中に不明なエラーが発生: Member ID = {}, Input = {}", memberId, playDto.getInputNumber(), e);
             try {
                 GameStatDto errorStat = gameService.getGameStatusForMain(memberId);
-                errorStat.setMessage("게임 처리 중 알 수 없는 오류가 발생했습니다.");
+                errorStat.setMessage("ゲームの処理中に不明なエラーが発生しました。");
                 errorStat.setGameOver(true);
                 return errorStat;
             } catch (Exception ex) {
-                log.error("일반 오류 후 게임 상태 로드 중 오류 발생: Member ID = {}", memberId, ex);
+                log.error("通常エラー後、ゲームステータスのロード中にエラーが発生: Member ID = {}", memberId, ex);
                 GameStatDto fatalError = new GameStatDto();
-                fatalError.setMessage("게임 처리 중 치명적인 오류 발생.");
+                fatalError.setMessage("ゲーム処理中に致命的なエラーが発生。");
                 fatalError.setGameOver(true);
                 return fatalError;
             }
@@ -122,17 +122,17 @@ public class GameController {
     public String gameResult(HttpSession session, Model model) {
         Long memberId = (Long) session.getAttribute("loggedInMemberId");
         if (memberId == null) {
-            log.warn("로그인되지 않은 사용자가 게임 결과 페이지에 접근 시도. 로그인 페이지로 리다이렉트.");
+            log.warn("ログインしていないユーザーがゲーム結果ページにアクセスしようとする。");
             return "redirect:/login";
         }
 
         try {
             GameResultDto gameResult = gameService.getGameResult(memberId);
             model.addAttribute("gameResult", gameResult);
-            log.info("게임 결과 페이지 로드 성공: Member ID = {}", memberId);
+            log.info("ゲーム結果ロード成功: Member ID = {}", memberId);
         } catch (Exception e) {
-            log.error("게임 결과 페이지 로드 중 오류 발생: Member ID = {}", memberId, e);
-            model.addAttribute("errorMessage", "게임 결과 로드 중 오류가 발생했습니다.");
+            log.error("ゲーム結果のロード中のエラー: Member ID = {}", memberId, e);
+            model.addAttribute("errorMessage", "ゲームの結果、ロード中にエラーが発生しました。");
             return "error/errorPage";
         }
         return "game-result";
