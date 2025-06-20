@@ -1,0 +1,192 @@
+@charset "utf-8";
+* { margin:0; padding:0; box-sizing:border-box; }
+
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	padding-top: 45px;
+	z-index: 1000;
+           	}
+        
+    
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 45px;
+    padding: 0 20px;
+    background-color: #3f63bf;
+	}
+
+header h1 {
+    color: white;
+    text-align: center;
+    line-height: 45px;
+    font-size: 24px;
+}
+
+
+/* login.jsp */
+
+.login-container {
+    width: 400px;
+
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.form-label {
+    min-width: 120px;
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.login-error-message {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* game-main.jsp */
+
+.total-point {
+    position: fixed;
+    top: 55px;
+    right: 20px;
+    background-color: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 1.1em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.total-point p {
+    margin: 0;
+    color: #495057;
+}
+
+.total-point span {
+    color: #007bff;
+}
+
+.game-container {
+    background-color: #fff;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 700px;
+    max-width: 90vw;
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.hidden-number {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.input-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.input-section label {
+    font-weight: bold;
+    color: #343a40;
+    white-space: nowrap;
+}
+
+#inputNumber {
+	text-align: center;
+}
+
+#confirmButton {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.game-system-message p {
+    color: #dc3545;
+    font-size: 0.95em;
+    min-height: 1.2em;
+}
+.record-table {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.record-table table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center; 
+    background-color: #fdfdfd;
+}
+
+.record-table th,
+.record-table td {
+    border: 1px solid #dee2e6;
+    padding: 12px 10px;
+}
+
+.record-table thead {
+    background-color: #e9ecef;
+    color: #343a40;
+}
+
+.record-table th {
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+.record-table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+
+/* game-reuslt.jsp */
+
+.game-result-container {
+	text-align: center; 
+	padding: 20px; 
+	border: 1px solid #ccc; 
+	max-width: 350px; 
+	margin: 20px auto;
+}
+.game-result-container p {
+	font-size: 1.2em;
+	font-weight: bold; 
+	margin-bottom: 15px;
+}
+
+.game-result-container span {
+	font-weight: bold;
+}

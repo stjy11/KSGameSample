@@ -1,0 +1,73 @@
+[쿼리문 모음]
+post sql : 포트 5432
+
+CREATE TABLE MEMBER_KS (
+    member_id INT PRIMARY KEY,               -- 회원 ID (기본 키)
+    member_name VARCHAR(50) NOT NULL UNIQUE, -- 회원 로그인 아이디 (고유해야 함)
+    member_password VARCHAR(100) NOT NULL,   -- 회원 비밀번호
+    create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 생성 일시 (자동 현재 시간)
+    update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 수정 일시 (자동 현재 시간)
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE -- 삭제 여부 플래그 (기본값: FALSE)
+);
+
+INSERT INTO MEMBER_KS (
+    member_id,
+    member_name,
+    member_password
+) VALUES (
+    1,
+    'admin',
+    '1234'
+);
+
+SELECT
+    member_id,
+    member_name,
+    member_password,
+    create_date,
+    update_date,
+    is_deleted
+FROM
+    MEMBER_KS;
+
+CREATE TABLE GAME_MAIN (
+    game_id BIGSERIAL PRIMARY KEY, -- 게임의 고유 식별자 (자동 증가, 기본 키)
+    member_id BIGINT NOT NULL,     -- 회원 테이블 (MEMBER)의 외래 키
+    hidden_num VARCHAR(3) NOT NULL, -- 숨겨진 3자리 숫자 (예: "012", "123")
+    play_date DATE NOT NULL,        -- 게임을 플레이한 날짜
+    game_success BOOLEAN NOT NULL,  -- 게임 성공 여부 (TRUE: 성공, FALSE: 실패)
+    game_play_att INTEGER NOT NULL, -- 현재까지 시도한 횟수
+    earned_points INTEGER NOT NULL DEFAULT 0, -- 이 게임에서 획득한 포인트 (초기값 0)
+
+    -- MEMBER 테이블의 member_id를 외래 키로 참조
+    CONSTRAINT fk_member_id
+        FOREIGN KEY (member_id)
+        REFERENCES MEMBER (member_id)
+);
+
+
+CREATE TABLE GAME_ATT (
+    game_att_id INT PRIMARY KEY,         -- 게임 시도 ID (기본 키)
+    game_id INT NOT NULL,                -- 게임 ID (외래 키)
+    game_att_num INT NOT NULL,           -- 몇 번째 시도인지 (예: 1번째 시도, 2번째 시도)
+    input_num JSONB NOT NULL,            -- 사용자가 입력한 숫자 (JSONB 타입)
+    game_hint VARCHAR(20) NOT NULL,      -- 게임 힌트 (예: 1S 2B)
+    att_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 시도 일시
+
+    CONSTRAINT fk_game_att_game_id
+        FOREIGN KEY (game_id)
+        REFERENCES GAME_MAIN(game_id)
+        ON DELETE CASCADE -- 게임 삭제 시 관련 시도 기록도 삭제
+);
+
+CREATE TABLE GAME_POINT (
+    member_id INT PRIMARY KEY,           -- 회원 ID (기본 키이자 외래 키)
+    total_point INT NOT NULL DEFAULT 0,  -- 총 게임 점수 (기본값: 0)
+    up_point_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 점수 업데이트 일시
+
+    CONSTRAINT fk_game_point_member_id
+        FOREIGN KEY (member_id)
+        REFERENCES MEMBER_KS(member_id)
+        ON DELETE CASCADE -- 회원 삭제 시 포인트 기록도 삭제
+);
+
